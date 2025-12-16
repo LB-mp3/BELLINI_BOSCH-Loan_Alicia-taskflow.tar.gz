@@ -18,9 +18,18 @@ spec:
         tier: backend
     spec:
       initContainers:
-      - name: wait-auth
-        image: busybox
-        command: ['sh', '-c', 'until nslookup auth.taskflow-backend.svc.cluster.local; do sleep 5; done']
+      - name: wait-for-auth
+        image: busybox:1.28
+        command:
+          - sh
+          - -c
+          - |
+            echo "Waiting for auth service..."
+            until nslookup auth-svc.taskflow-backend.svc.cluster.local; do
+              echo "Auth not ready, waiting..."
+              sleep 3
+            done
+            echo "Auth service is ready!"
       containers:
       - name: tasks
         image: hashicorp/http-echo:latest

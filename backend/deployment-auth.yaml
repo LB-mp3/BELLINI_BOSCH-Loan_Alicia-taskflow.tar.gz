@@ -18,9 +18,18 @@ spec:
         tier: backend
     spec:
       initContainers:
-      - name: wait-notifications
-        image: busybox
-        command: ['sh', '-c', 'until nslookup notifications.taskflow-backend.svc.cluster.local; do sleep 5; done']
+      - name: wait-for-notifications
+        image: busybox:1.28
+        command:
+          - sh
+          - -c
+          - |
+            echo "Waiting for notifications service..."
+            until nslookup notifications-svc.taskflow-backend.svc.cluster.local; do
+              echo "Notifications not ready, waiting..."
+              sleep 3
+            done
+            echo "Notifications service is ready!"
       containers:
       - name: auth
         image: hashicorp/http-echo:latest

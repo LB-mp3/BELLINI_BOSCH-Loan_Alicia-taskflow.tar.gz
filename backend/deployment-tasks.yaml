@@ -23,24 +23,39 @@ spec:
         command: ['sh', '-c', 'until nslookup auth.taskflow-backend.svc.cluster.local; do sleep 5; done']
       containers:
       - name: tasks
-        image: nginx:1.25-alpine
+        image: hashicorp/http-echo:latest
+        args:
+          - "-text=Tasks Service"
+          - "-listen=:8081"
         ports:
-        - containerPort: 80
+        - containerPort: 8081
+          name: http
         resources:
           requests:
             cpu: 50m
-            memory: 64Mi
+            memory: 32Mi
           limits:
             cpu: 100m
-            memory: 128Mi
+            memory: 64Mi
         livenessProbe:
           httpGet:
             path: /
-            port: 80
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 5
         readinessProbe:
           httpGet:
             path: /
-            port: 80
+            port: 8081
+          initialDelaySeconds: 3
+          periodSeconds: 3
       - name: health-checker
-        image: busybox
-        command: ['sh', '-c', 'while true; do wget -qO- http://localhost; sleep 20; done']
+        image: curlimages/curl:latest
+        command: ['sh', '-c', 'while true; do curl -s http://metrics-svc:5001 || echo "Metrics unreachable"; sleep 5; done']
+        resources:
+          requests:
+            cpu: 20m
+            memory: 16Mi
+          limits:
+            cpu: 50m
+            memory: 32Mi

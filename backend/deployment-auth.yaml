@@ -23,24 +23,56 @@ spec:
         command: ['sh', '-c', 'until nslookup notifications.taskflow-backend.svc.cluster.local; do sleep 5; done']
       containers:
       - name: auth
-        image: nginx:1.25-alpine
+        image: hashicorp/http-echo:latest
+        args:
+          - "-text=Auth Service"
+          - "-listen=:5000"
         ports:
-        - containerPort: 80
+        - containerPort: 5000
+          name: http
         resources:
           requests:
             cpu: 50m
-            memory: 64Mi
+            memory: 32Mi
           limits:
             cpu: 100m
-            memory: 128Mi
+            memory: 64Mi
         livenessProbe:
           httpGet:
             path: /
-            port: 80
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
         readinessProbe:
           httpGet:
             path: /
-            port: 80
-      - name: audit
-        image: busybox
-        command: ['sh', '-c', 'while true; do echo audit log; sleep 30; done']
+            port: 5000
+          initialDelaySeconds: 3
+          periodSeconds: 3
+      - name: audit-sidecar
+        image: hashicorp/http-echo:latest
+        args:
+          - "-text=Audit Sidecar"
+          - "-listen=:9090"
+        ports:
+        - containerPort: 9090
+          name: audit
+        resources:
+          requests:
+            cpu: 20m
+            memory: 16Mi
+          limits:
+            cpu: 50m
+            memory: 32Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9090
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9090
+          initialDelaySeconds: 3
+          periodSeconds: 3

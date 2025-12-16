@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: taskflow-frontend
+  labels:
+    name: taskflow-frontend   # Required for NetworkPolicy!
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: taskflow-backend
+  labels:
+    name: taskflow-backend    # Required for NetworkPolicy

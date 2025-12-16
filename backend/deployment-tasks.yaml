@@ -40,14 +40,9 @@ spec:
         - containerPort: 8081
           name: http
         volumeMounts:
-      - name: api-keys
-        mountPath: /etc/secrets
-        readOnly: true
-  volumes:
-    - name: secrets
-      secret:
-        secretName: api-keys
-        
+        - name: api-keys
+          mountPath: /etc/secrets
+          readOnly: true
         resources:
           requests:
             cpu: 50m
@@ -69,7 +64,14 @@ spec:
           periodSeconds: 3
       - name: health-checker
         image: curlimages/curl:latest
-        command: ['sh', '-c', 'while true; do curl -s http://metrics-svc:5001 || echo "Metrics unreachable"; sleep 5; done']
+        command:
+          - sh
+          - -c
+          - |
+            while true; do
+              curl -s http://metrics-svc:5001 || echo "Metrics unreachable"
+              sleep 5
+            done
         resources:
           requests:
             cpu: 20m
@@ -77,3 +79,7 @@ spec:
           limits:
             cpu: 50m
             memory: 32Mi
+      volumes:
+      - name: api-keys
+        secret:
+          secretName: secrets-apikeys

@@ -39,6 +39,15 @@ spec:
         ports:
         - containerPort: 8081
           name: http
+        volumeMounts:
+      - name: api-keys
+        mountPath: /etc/secrets
+        readOnly: true
+  volumes:
+    - name: secrets
+      secret:
+        secretName: api-keys
+        
         resources:
           requests:
             cpu: 50m

@@ -39,6 +39,14 @@ spec:
         ports:
         - containerPort: 5000
           name: http
+        volumeMounts:
+      - name: secrets
+        mountPath: /etc/secrets
+        readOnly: true
+  volumes:
+    - name: secrets
+      secret:
+        secretName: auth-secrets
         resources:
           requests:
             cpu: 50m

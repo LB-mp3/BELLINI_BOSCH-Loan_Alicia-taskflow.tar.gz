@@ -54,13 +54,13 @@ spec:
           httpGet:
             path: /
             port: 5000
-          initialDelaySeconds: 5
+          initialDelaySeconds: 10
           periodSeconds: 5
         readinessProbe:
           httpGet:
             path: /
             port: 5000
-          initialDelaySeconds: 3
+          initialDelaySeconds: 5
           periodSeconds: 3
       - name: audit-sidecar
         image: hashicorp/http-echo:latest
@@ -81,15 +81,16 @@ spec:
           httpGet:
             path: /
             port: 9090
-          initialDelaySeconds: 5
+          initialDelaySeconds: 10
           periodSeconds: 5
         readinessProbe:
           httpGet:
             path: /
             port: 9090
-          initialDelaySeconds: 3
+          initialDelaySeconds: 5
           periodSeconds: 3
       volumes:
       - name: secrets
         secret:
           secretName: secrets-auth
+ 

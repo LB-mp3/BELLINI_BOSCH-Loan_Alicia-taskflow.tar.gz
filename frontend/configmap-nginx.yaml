@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: api-gateway-config
+  name: frontend-config
   namespace: taskflow-frontend
 data:
   nginx.conf: |
@@ -32,3 +32,8 @@ data:
             }
         }
     }
+  index.html: |
+    <html>
+      <head><title>Frontend</title></head>
+      <body><h1>Frontend works!</h1></body>
+    </html>

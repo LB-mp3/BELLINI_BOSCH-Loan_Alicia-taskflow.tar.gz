@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-health-checker-to-metrics
+  namespace: taskflow-backend
+spec:
+  podSelector:
+    matchLabels:
+      app: metrics
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: health-checker

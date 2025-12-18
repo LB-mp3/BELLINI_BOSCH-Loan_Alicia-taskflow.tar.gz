@@ -1,39 +1,74 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: frontend-config
+  name: nginx-gateway-config
   namespace: taskflow-frontend
 data:
   nginx.conf: |
-    events {}
-    http {
-        server {
-            listen 80;
-
-            location /health {
-                return 200 'Gateway healthy';
-                add_header Content-Type text/plain;
-            }
-
-            location /auth {
-                proxy_pass http://auth-svc.taskflow-backend:5000;
-            }
-
-            location /tasks {
-                proxy_pass http://tasks-svc.taskflow-backend:8081;
-            }
-
-            location /notifications {
-                proxy_pass http://notifications-svc.taskflow-backend:3001;
-            }
-
-            location /metrics {
-                proxy_pass http://metrics-svc.taskflow-backend:5001;
-            }
-        }
+    events {
+      worker_connections 1024;
     }
-  index.html: |
-    <html>
-      <head><title>Frontend</title></head>
-      <body><h1>Frontend works!</h1></body>
-    </html>
+
+    http {
+      access_log /dev/stdout;
+      error_log /dev/stderr;
+
+      # Upstream blocks
+      upstream auth {
+        server auth-svc.taskflow-backend.svc.cluster.local:5000;
+      }
+
+      upstream tasks {
+        server tasks-svc.taskflow-backend.svc.cluster.local:8081;
+      }
+
+      upstream notifications {
+        server notifications-svc.taskflow-backend.svc.cluster.local:3001;
+      }
+
+      upstream metrics {
+        server metrics-svc.taskflow-backend.svc.cluster.local:5001;
+      }
+
+      server {
+        listen 3000;
+
+        location /health {
+          return 200 "Gateway healthy\n";
+          add_header Content-Type text/plain;
+        }
+
+        # Route for auth
+        location /auth {
+          proxy_pass http://auth;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+        }
+
+        # Route for tasks
+        location /tasks {
+          proxy_pass http://tasks;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+        }
+
+        # Route for notifications
+        location /notifications {
+          proxy_pass http://notifications;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+        }
+
+        # Route for metrics
+        location /metrics {
+          proxy_pass http://metrics;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+        }
+
+        location / {
+          return 200 "TaskFlow API Gateway\n";
+          add_header Content-Type text/plain;
+        }
+      }
+    }

@@ -72,6 +72,10 @@ spec:
               curl -s http://metrics-svc:5001 || echo "Metrics unreachable"
               sleep 5
             done
+        volumeMounts: 
+        - name: api-keys
+          mountPath: /etc/secrets
+          readOnly: true
         resources:
           requests:
             cpu: 20m
@@ -82,4 +86,4 @@ spec:
       volumes:
       - name: api-keys
         secret:
-          secretName: secrets-apikeys
+          secretName: api-keys

@@ -1,17 +1,17 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-gateway-to-backend
+  name: allow-from-gateway
   namespace: taskflow-backend
 spec:
-  podSelector: {}  # Applies to all pods
+  podSelector: {} # Applies to all pods 
   policyTypes:
   - Ingress
   ingress:
   - from:
     - namespaceSelector:
         matchLabels:
-          name: taskflow-frontend
-    - podSelector:
+          kubernetes.io/metadata.name: taskflow-frontend
+      podSelector:
         matchLabels:
           app: api-gateway

@@ -4,14 +4,14 @@ metadata:
   name: allow-dns-egress
   namespace: taskflow-backend
 spec:
-  podSelector: {}   # All pods
+  podSelector: {}
   policyTypes:
   - Egress
   egress:
   - to:
-    - namespaceSelector: {}   # Any namespace
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
     ports:
     - protocol: UDP
-      port: 53
-    - protocol: TCP
       port: 53
